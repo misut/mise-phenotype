@@ -13,6 +13,14 @@ local function supported_platforms()
     return table.concat(keys, ", ")
 end
 
+local function archive_prefix(version)
+    local major, minor = version:match("^(%d+)%.(%d+)")
+    if major and minor and tonumber(major) == 0 and tonumber(minor) < 16 then
+        return "phenotype-cli"
+    end
+    return "phenotype"
+end
+
 function PLUGIN:PreInstall(ctx)
     local version = ctx.version:gsub("^v", "")
     local key = RUNTIME.osType .. "-" .. RUNTIME.archType
@@ -22,7 +30,7 @@ function PLUGIN:PreInstall(ctx)
     end
 
     local ext = (RUNTIME.osType == "windows") and ".zip" or ".tar.gz"
-    local filename = "phenotype-cli-v" .. version .. "-" .. platform .. ext
+    local filename = archive_prefix(version) .. "-v" .. version .. "-" .. platform .. ext
 
     return {
         version = version,
