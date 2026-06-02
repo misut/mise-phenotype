@@ -1,9 +1,12 @@
 local http = require("http")
 local json = require("json")
 
-local function has_cli_asset(release)
+local function has_binary_asset(release)
     for _, asset in ipairs(release.assets or {}) do
-        if asset.name and asset.name:match("^phenotype%-cli%-v") then
+        if asset.name and (
+            asset.name:match("^phenotype%-v") or
+            asset.name:match("^phenotype%-cli%-v")
+        ) then
             return true
         end
     end
@@ -33,7 +36,7 @@ function PLUGIN:Available(ctx)
     local result = {}
 
     for _, release in ipairs(releases) do
-        if not release.draft and not release.prerelease and has_cli_asset(release) then
+        if not release.draft and not release.prerelease and has_binary_asset(release) then
             local version = release.tag_name:gsub("^v", "")
             table.insert(result, { version = version })
         end
